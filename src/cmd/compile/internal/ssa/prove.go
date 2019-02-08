@@ -202,7 +202,7 @@ func newFactsTable(f *Func) *factsTable {
 func (ft *factsTable) update(parent *Block, v, w *Value, d domain, r relation) {
 	if parent.Func.pass.debug > 2 {
 		// parent.Func.Warnl(parent.Pos, "    parent=%s, update %s %s %s %s", parent, v, w, d,r)
-		fmt.Printf("%d    parent=%s, update %s %s %s %s\n", parent.Pos.Line(),parent, v, w, d,r)
+		fmt.Printf("%d    parent=%s, update %s %s %s %s\n", parent.Pos.Line(), parent, v, w, d, r)
 	}
 	// No need to do anything else if we already found unsat.
 	if ft.unsat {
@@ -243,7 +243,7 @@ func (ft *factsTable) update(parent *Block, v, w *Value, d domain, r relation) {
 		if !ok {
 			if parent.Func.pass.debug > 2 {
 				// parent.Func.Warnl(parent.Pos, "update poset unsat %s %s %s %s", v, w, d, r)
-				fmt.Printf("%d update poset unsat %s %s %s %s\n",parent.Pos.Line(), v, w, d, r)
+				fmt.Printf("%d update poset unsat %s %s %s %s\n", parent.Pos.Line(), v, w, d, r)
 			}
 			ft.unsat = true
 			return
@@ -273,7 +273,7 @@ func (ft *factsTable) update(parent *Block, v, w *Value, d domain, r relation) {
 		if oldR&r == 0 {
 			if parent.Func.pass.debug > 2 {
 				// parent.Func.Warnl(parent.Pos, "update facts unsat %s %s %s %s", v, w, d,r)
-				fmt.Printf("%d update facts unsat %s %s %s %s\n",parent.Pos.Line(), v, w, d,r)
+				fmt.Printf("%d update facts unsat %s %s %s %s\n", parent.Pos.Line(), v, w, d, r)
 			}
 			ft.unsat = true
 			return
@@ -459,7 +459,7 @@ func (ft *factsTable) update(parent *Block, v, w *Value, d domain, r relation) {
 		if x, delta := isConstDelta(v); x != nil && d == signed {
 			if parent.Func.pass.debug > 1 {
 				// parent.Func.Warnl(parent.Pos, "x+d %s w; x:%v %v delta:%v w:%v d:%v", r, x, parent.String(), delta, w.AuxInt, d)
-				fmt.Printf("%d x+d %s w; x:%v %v delta:%v w:%v d:%v\n",parent.Pos.Line(), r, x, parent.String(), delta, w.AuxInt, d)
+				fmt.Printf("%d x+d %s w; x:%v %v delta:%v w:%v d:%v\n", parent.Pos.Line(), r, x, parent.String(), delta, w.AuxInt, d)
 			}
 			if !w.isGenericIntConst() {
 				// If we know that x+delta > w but w is not constant, we can derive:
@@ -756,7 +756,6 @@ func prove(f *Func) {
 		fmt.Printf("\n%d Checkpoint: Begin Prove\n", f.Entry.Pos.Line())
 		fmt.Println("Begin len/cap op search\n")
 	}
-	
 
 	// Find length and capacity ops.
 	var zero *Value
@@ -814,9 +813,9 @@ func prove(f *Func) {
 	ft.zero = zero
 
 	if f.pass.debug > 2 {
-		fmt.Println("End len/cap op search","\n","Get Induction Vars from loop_bce","\n")
+		fmt.Println("End len/cap op search", "\n", "Get Induction Vars from loop_bce", "\n")
 	}
-	
+
 	// Find induction variables. Currently, findIndVars
 	// is limited to one induction variable per block.
 	var indVars map[*Block]indVar
@@ -826,7 +825,7 @@ func prove(f *Func) {
 		}
 		indVars[v.entry] = v
 	}
-	
+
 	if f.pass.debug > 2 {
 		fmt.Println("Begin worklist value prop\n")
 	}
@@ -871,7 +870,7 @@ func prove(f *Func) {
 			ft.checkpoint()
 			if node.block.Func.pass.debug > 2 {
 				// node.block.Func.Warnl(node.block.Pos, "Checkpoint: %s DFS Descending, idom:%s", node.block, parent)
-				fmt.Printf("\n%d Checkpoint: %s DFS Descending, idom:%s\n",node.block.Pos.Line(), node.block, parent)
+				fmt.Printf("\n%d Checkpoint: %s DFS Descending, idom:%s\n", node.block.Pos.Line(), node.block, parent)
 			}
 			if iv, ok := indVars[node.block]; ok {
 				addIndVarRestrictions(ft, parent, iv)
@@ -888,11 +887,11 @@ func prove(f *Func) {
 					if node.block.Func.pass.debug > 2 {
 						for i, lim := range ft.limits {
 							// node.block.Func.Warnl(node.block.Pos, "Restore: %s DFS Descending (unsat), branch %s from %s\n", node.block, branch, parent)
-							fmt.Printf("%d Restore old limits v%d %s\n\n",node.block.Pos.Line(), i, lim.String())
+							fmt.Printf("%d Restore old limits v%d %s\n\n", node.block.Pos.Line(), i, lim.String())
 						}
 						// node.block.Func.Warnl(node.block.Pos, "\n")
 						fmt.Println()
-						}	
+					}
 					break
 				}
 				// Otherwise, we can now commit to
@@ -919,10 +918,10 @@ func prove(f *Func) {
 			ft.restore()
 			if node.block.Func.pass.debug > 2 {
 				// node.block.Func.Warnl(node.block.Pos, "Restore: %s DFS Descending(simplify)", node.block)
-				fmt.Printf("%d Restore: %s DFS Descending(simplify)\n",node.block.Pos.Line(), node.block)
+				fmt.Printf("%d Restore: %s DFS Descending(simplify)\n", node.block.Pos.Line(), node.block)
 				for i, lim := range ft.limits {
 					// node.block.Func.Warnl(node.block.Pos, "Restore old limits v%d %s", i, lim.String())
-					fmt.Printf("%d Restore old limits v%d %s\n",node.block.Pos.Line(), i, lim.String())
+					fmt.Printf("%d Restore old limits v%d %s\n", node.block.Pos.Line(), i, lim.String())
 				}
 				// node.block.Func.Warnl(node.block.Pos, "\n")
 				fmt.Println()
@@ -978,10 +977,10 @@ func addIndVarRestrictions(ft *factsTable, b *Block, iv indVar) {
 	// TODO: Investigate if this should be satisfied by case
 	// CHANGED: changed to use ft.isNonNegative instead of plain isNonNegatlegive()
 	// This is sort of a kludgy fix for the problem. This allows the induction variable to earn a max in the unsigned domain if earlier information in the fact table about its arguments shows it is nonnegative. This has a couple of effects later, when this same value (the Phi induction var) is used in a bounds check inside its loop, (via addBranchRestriction). In addbranchrestrictions, in cases of isinbounds, the domain of the branch restriction update is limited to unsigned unless we can further determine that the arg[0] to the isinbounds is ft.nonnegative. Because we were able to earn the umax earlier, even if we couldnt prove that arg[0] ft.isnonnegative, the attempt to update the unsigned domain would fail where umax of the arg cannot be >= the slicelen, thus proving the BC was not needed. ALSO, because we earned the umax earlier, we can in fact prove that arg[0] is ft.nonnegative by virtue of having a limit containing a l.umax <= math.MaxInt64, thus also establishing the update in the signed domain, which we would ALSO find unsat where max cannot be >= slicelen in the loop.
-	
-	// This is all only neccesary because the signed 0 minimum from the hint provided before the loop (if n<0 {panic}) is not being passed through to the limits of its phi value, because the phi value limits are calculated in a later update, and there is currently no (a) loopback to include limits based on earlier values outside the control op being tested.(eg Phi v1 v2, when tested, doesnt reach back and intersect its new limits with the limits established earlier for v1 and v2), OR (b) limits and/or nonnegative is not taking advantage of the signed poset, which currently seems to lack an straightforward way to check for OrderedOrEq(0, v1).  
+
+	// This is all only neccesary because the signed 0 minimum from the hint provided before the loop (if n<0 {panic}) is not being passed through to the limits of its phi value, because the phi value limits are calculated in a later update, and there is currently no (a) loopback to include limits based on earlier values outside the control op being tested.(eg Phi v1 v2, when tested, doesnt reach back and intersect its new limits with the limits established earlier for v1 and v2), OR (b) limits and/or nonnegative is not taking advantage of the signed poset, which currently seems to lack an straightforward way to check for OrderedOrEq(0, v1).
 	if ft.isNonNegative(iv.min) && ft.isNonNegative(iv.max) {
-	// if isNonNegative(iv.min) && isNonNegative(iv.max) {
+		// if isNonNegative(iv.min) && isNonNegative(iv.max) {
 		d |= unsigned
 	}
 	if b.Func.pass.debug > 2 {
@@ -1048,13 +1047,21 @@ func addBranchRestrictions(ft *factsTable, b *Block, br branch) {
 				if ft.isNonNegative(c.Args[0]) {
 					d |= signed
 				}
+				// need to think about this more, will require full reorder of these switches
+				// else if ft.order[0].Ordered(c.Args[0], c.Args[1]) { // ADDED BY ME - try top end to learn a0<0
+				// 	// need to separate for OpSliceIsInBounds b/c top is <= instead of strict used here
+				// 	addRestrictions(b, ft, signed, c.Args[0], ft.zero, lt | eq)
+				// }
 			}
 			addRestrictions(b, ft, d, c.Args[0], c.Args[1], tr.r^(lt|gt|eq))
 		case positive:
 			addRestrictions(b, ft, d, c.Args[0], c.Args[1], tr.r)
 			// also learn that 0 <= a0
-			// add this for issue #28885. 
-			//addRestrictions(b, ft, signed, ft.zero, c.Args[0], lt | eq)
+			// add this for issue #28885.
+			switch b.Control.Op {
+			case OpIsInBounds, OpIsSliceInBounds:
+				addRestrictions(b, ft, signed, ft.zero, c.Args[0], lt|eq)
+			}
 		}
 	}
 }
@@ -1076,7 +1083,7 @@ func addRestrictions(parent *Block, ft *factsTable, t domain, v, w *Value, r rel
 			fmt.Printf("%d   update from addRestrictions\n", parent.Pos.Line())
 		}
 		ft.update(parent, v, w, i, r)
-		
+
 	}
 }
 
@@ -1168,7 +1175,7 @@ func addLocalInductiveFacts(ft *factsTable, b *Block) {
 			ft.checkpoint()
 			if b.Func.pass.debug > 2 {
 				// b.Func.Warnl(b.Pos, "Checkpoint: %s LocalInductiveFacts Value: %s", b, i1)
-				fmt.Printf("\n%d Checkpoint: %s LocalInductiveFacts Value: %s\n",b.Pos.Line(),  b, i1)
+				fmt.Printf("\n%d Checkpoint: %s LocalInductiveFacts Value: %s\n", b.Pos.Line(), b, i1)
 			}
 			ft.update(b, min, max, tr.d, gt|eq)
 			if b.Func.pass.debug > 2 {
@@ -1182,7 +1189,7 @@ func addLocalInductiveFacts(ft *factsTable, b *Block) {
 				fmt.Printf("%d Restore: %s LocalInductiveFacts Value: %s\n", b.Pos.Line(), b, i1)
 				for i, lim := range ft.limits {
 					// b.Func.Warnl(b.Pos, "Restore old limits v%d %s", i, lim.String())
-					fmt.Printf("%d Restore old limits v%d %s\n",b.Pos.Line(), i, lim.String())
+					fmt.Printf("%d Restore old limits v%d %s\n", b.Pos.Line(), i, lim.String())
 				}
 				// b.Func.Warnl(b.Pos, "\n")
 				fmt.Println()
@@ -1250,7 +1257,7 @@ func simplifyBlock(sdom SparseTree, ft *factsTable, b *Block) {
 			if lim.umin > 0 || lim.min > 0 || lim.max < 0 {
 				if b.Func.pass.debug > 0 {
 					// b.Func.Warnl(v.Pos, "Proved %v non-zero", v.Op)
-					fmt.Printf("%d Proved %v non-zero\n",v.Pos.Line(), v.Op)
+					fmt.Printf("%d Proved %v non-zero\n", v.Pos.Line(), v.Op)
 				}
 				v.Op = ctzNonZeroOp[v.Op]
 			}
@@ -1279,7 +1286,7 @@ func simplifyBlock(sdom SparseTree, ft *factsTable, b *Block) {
 				v.AuxInt = 1 // see shiftIsBounded
 				if b.Func.pass.debug > 0 {
 					// b.Func.Warnl(v.Pos, "Proved %v bounded", v.Op)
-					fmt.Printf("%d Proved %v bounded\n",v.Pos.Line(), v.Op)
+					fmt.Printf("%d Proved %v bounded\n", v.Pos.Line(), v.Op)
 				}
 			}
 		case OpDiv16, OpDiv32, OpDiv64, OpMod16, OpMod32, OpMod64:
@@ -1296,7 +1303,7 @@ func simplifyBlock(sdom SparseTree, ft *factsTable, b *Block) {
 				// so we need to add fix-up code.
 				if b.Func.pass.debug > 0 {
 					// b.Func.Warnl(v.Pos, "Proved %v does not need fix-up", v.Op)
-					fmt.Printf("%d Proved %v does not need fix-up\n",v.Pos.Line(), v.Op)
+					fmt.Printf("%d Proved %v does not need fix-up\n", v.Pos.Line(), v.Op)
 				}
 			}
 		}
@@ -1320,15 +1327,15 @@ func simplifyBlock(sdom SparseTree, ft *factsTable, b *Block) {
 		ft.checkpoint()
 		if parent.Func.pass.debug > 2 {
 			// parent.Func.Warnl(parent.Pos, "Checkpoint Simplify: %s -> %s Branch: %s", parent, b, branch)
-			fmt.Printf("\n%d Checkpoint Simplify: %s -> %s Branch: %s\n",parent.Pos.Line(), parent, b, branch)
+			fmt.Printf("\n%d Checkpoint Simplify: %s -> %s Branch: %s\n", parent.Pos.Line(), parent, b, branch)
 		}
 		addBranchRestrictions(ft, parent, branch)
 		unsat := ft.unsat
 		ft.restore()
 		if parent.Func.pass.debug > 2 {
-			fmt.Printf( "%d Restore Simplify: %s -> %s Branch: %s\n", parent.Pos.Line(),parent, b, branch)
+			fmt.Printf("%d Restore Simplify: %s -> %s Branch: %s\n", parent.Pos.Line(), parent, b, branch)
 			for i, lim := range ft.limits {
-				fmt.Printf( "%d Restore old limits v%d %s\n",parent.Pos.Line(), i, lim.String())
+				fmt.Printf("%d Restore old limits v%d %s\n", parent.Pos.Line(), i, lim.String())
 			}
 			fmt.Println()
 		}
@@ -1360,7 +1367,7 @@ func removeBranch(b *Block, branch branch) {
 			// b.Func.Warnl(b.Pos, "%s %s", verb, c.Op)
 			fmt.Printf("%d %s %s\n", b.Pos.Line(), verb, c.Op)
 		}
-		fmt.Printf( "%d Remove Branch %s Branch: %d\n", b.Pos.Line(), b, branch)
+		fmt.Printf("%d Remove Branch %s Branch: %d\n", b.Pos.Line(), b, branch)
 	}
 	b.Kind = BlockFirst
 	b.SetControl(nil)

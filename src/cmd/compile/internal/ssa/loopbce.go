@@ -233,7 +233,7 @@ func printIndVar(b *Block, i, min, max *Value, inc int64, flags indVarFlags) {
 	extra := ""
 	if b.Func.pass.debug >= 2 {
 		extra = fmt.Sprintf(" (%s)", i)
-		fmt.Printf("%d Induction variable: %s entry: %s limits %v%v,%v%v, increment %d%s\n",b.Pos.Line(), b, b.Succs[0].b, mb1, mlim1, mlim2, mb2, inc, extra)
+		fmt.Printf("%d Induction variable: %s entry: %s limits %v%v,%v%v, increment %d%s\n", b.Pos.Line(), b, b.Succs[0].b, mb1, mlim1, mlim2, mb2, inc, extra)
 	}
 	b.Func.Warnl(b.Pos, "Induction variable: limits %v%v,%v%v, increment %d%s", mb1, mlim1, mlim2, mb2, inc, extra)
 }
