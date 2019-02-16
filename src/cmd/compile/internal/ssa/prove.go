@@ -585,7 +585,8 @@ func (ft *factsTable) isNonNegative(v *Value) bool {
 	}
 
 	// Check the poset
-	return ft.order[0].OrderedOrEqual(ft.zero, v)
+	// return ft.order[0].OrderedOrEqual(ft.zero, v)
+	return false
 }
 
 // checkpoint saves the current state of known relations.
@@ -804,13 +805,23 @@ func prove(f *Func) {
 					fmt.Printf("%d   update from len/cap search\n", v.Pos.Line())
 				}
 				ft.update(b, v, zero, signed, gt|eq)
+			case OpSignExt8to16, OpSignExt8to32, OpSignExt8to64, OpSignExt16to32, OpSignExt16to64, OpSignExt32to64:
+
+				// Sign extension preserves signed equality.
+
+				ft.order[0].SetEqual(v, v.Args[0])
+			case OpZeroExt8to16, OpZeroExt8to32, OpZeroExt8to64, OpZeroExt16to32, OpZeroExt16to64, OpZeroExt32to64:
+
+				// Zero extension preserves unsigned equality.
+
+				ft.order[1].SetEqual(v, v.Args[0])
 			}
 		}
 	}
-	if zero == nil {
-		zero = f.Entry.NewValue0I(f.Entry.Pos, OpConst64, f.Config.Types.Int64, 0)
-	}
-	ft.zero = zero
+	// if zero == nil {
+	// 	zero = f.Entry.NewValue0I(f.Entry.Pos, OpConst64, f.Config.Types.Int64, 0)
+	// }
+	// ft.zero = zero
 
 	if f.pass.debug > 2 {
 		fmt.Println("End len/cap op search", "\n", "Get Induction Vars from loop_bce", "\n")
@@ -1031,6 +1042,10 @@ func addBranchRestrictions(ft *factsTable, b *Block, br branch) {
 		case negative:
 			switch b.Control.Op { // Special cases
 			case OpIsInBounds, OpIsSliceInBounds:
+				// v := c.Args[0]
+				// if v.Op == OpSignExt32to64 {
+				// 	v = v.Args[0]
+				// }
 				// 0 <= a0 < a1 (or 0 <= a0 <= a1)
 				//
 				// On the positive branch, we learn a0 < a1,
@@ -1044,6 +1059,7 @@ func addBranchRestrictions(ft *factsTable, b *Block, br branch) {
 				// condition, so check if a0 is non-negative instead,
 				// to be able to learn something.
 				d = unsigned
+				// if ft.isNonNegative(v) {
 				if ft.isNonNegative(c.Args[0]) {
 					d |= signed
 				}
@@ -1052,6 +1068,7 @@ func addBranchRestrictions(ft *factsTable, b *Block, br branch) {
 				// 	// need to separate for OpSliceIsInBounds b/c top is <= instead of strict used here
 				// 	addRestrictions(b, ft, signed, c.Args[0], ft.zero, lt | eq)
 				// }
+				// addRestrictions(b, ft, d, v, c.Args[1], tr.r^(lt|gt|eq))
 			}
 			addRestrictions(b, ft, d, c.Args[0], c.Args[1], tr.r^(lt|gt|eq))
 		case positive:
@@ -1060,7 +1077,12 @@ func addBranchRestrictions(ft *factsTable, b *Block, br branch) {
 			// add this for issue #28885.
 			switch b.Control.Op {
 			case OpIsInBounds, OpIsSliceInBounds:
-				addRestrictions(b, ft, signed, ft.zero, c.Args[0], lt|eq)
+				// v := c.Args[0]
+				// if v.Op == OpSignExt32to64 {
+				// 	v = v.Args[0]
+				// }
+				// addRestrictions(b, ft, d, v, c.Args[1], tr.r)
+				// addRestrictions(b, ft, signed, ft.zero, c.Args[0], lt|eq)
 			}
 		}
 	}
