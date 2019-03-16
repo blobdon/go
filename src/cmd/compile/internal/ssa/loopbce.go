@@ -272,6 +272,9 @@ func findIndVar(f *Func) []indVar {
 		if f.pass.debug >= 1 {
 			printIndVar(b, ind, min, max, step, flags)
 		}
+		if f.pass.debug == -1 {
+			printIndVar(b, ind, min, max, step, flags)
+		}
 
 		iv = append(iv, indVar{
 			ind:   ind,
@@ -312,6 +315,9 @@ func printIndVar(b *Block, i, min, max *Value, inc int64, flags indVarFlags) {
 		} else {
 			mlim1 = "?"
 		}
+		if b.Func.pass.debug == -1 {
+			mlim1 = fmt.Sprint(min)
+		}
 	}
 	if !max.isGenericIntConst() {
 		if b.Func.pass.debug >= 2 {
@@ -319,10 +325,17 @@ func printIndVar(b *Block, i, min, max *Value, inc int64, flags indVarFlags) {
 		} else {
 			mlim2 = "?"
 		}
+		if b.Func.pass.debug == -1 {
+			mlim2 = fmt.Sprint(max)
+		}
 	}
 	extra := ""
 	if b.Func.pass.debug >= 2 {
 		extra = fmt.Sprintf(" (%s)", i)
+	}
+	if b.Func.pass.debug == -1 {
+		extra = fmt.Sprintf(" (%s)", i)
+		fmt.Printf("%d Induction variable: %s entry: %s limits %v%v,%v%v, increment %d%s\n", b.Pos.Line(), b, b.Succs[0].b, mb1, mlim1, mlim2, mb2, inc, extra)
 	}
 	b.Func.Warnl(b.Pos, "Induction variable: limits %v%v,%v%v, increment %d%s", mb1, mlim1, mlim2, mb2, inc, extra)
 }
